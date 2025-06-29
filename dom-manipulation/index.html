@@ -21,7 +21,10 @@
     <hr>
 
     <div id="formContainer"></div> <!-- placeholder for dynamically generated form -->
-
+    <hr>
+    <h2>Import / Export Quotes</h2>
+    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+    <button onclick="exportToJsonFile()">Export Quotes to JSON</button>
     <script src="script.js"></script>
 </body>
 
