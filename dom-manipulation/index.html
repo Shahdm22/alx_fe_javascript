@@ -30,6 +30,9 @@
     <h2>Import / Export Quotes</h2>
     <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
     <button onclick="exportToJsonFile()">Export Quotes to JSON</button>
+    <div id="notification" style="color: red; margin-top: 10px;"></div>
+    <button onclick="syncWithServer()">Sync Now</button>
+
     <script src="script.js"></script>
 </body>
 

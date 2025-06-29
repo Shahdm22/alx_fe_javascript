@@ -1,6 +1,12 @@
 let quotes = [];
-let selectedCategory = "all"; // ✅ REQUIRED by checker
+let selectedCategory = "all";
 
+// Simulated server data
+let simulatedServerQuotes = [
+    { text: "This is from the server.", category: "Server" }
+];
+
+// Load quotes from localStorage or default
 function loadQuotes() {
     const storedQuotes = localStorage.getItem("quotes");
     if (storedQuotes) {
@@ -34,8 +40,7 @@ function loadSelectedFilter() {
 
 function populateCategories() {
     const categoryFilter = document.getElementById("categoryFilter");
-
-    const categories = quotes.map(q => q.category); // ✅ map used
+    const categories = quotes.map(q => q.category);
     const uniqueCategories = [...new Set(categories)];
 
     categoryFilter.innerHTML = "";
@@ -43,23 +48,23 @@ function populateCategories() {
     const allOption = document.createElement("option");
     allOption.value = "all";
     allOption.textContent = "All Categories";
-    categoryFilter.appendChild(allOption); // ✅ appendChild used
+    categoryFilter.appendChild(allOption);
 
     uniqueCategories.forEach(category => {
         const option = document.createElement("option");
         option.value = category;
         option.textContent = category;
-        categoryFilter.appendChild(option); // ✅ appendChild used
+        categoryFilter.appendChild(option);
     });
 
-    selectedCategory = loadSelectedFilter(); // ✅ set selectedCategory
+    selectedCategory = loadSelectedFilter();
     categoryFilter.value = selectedCategory;
     filterQuotes();
 }
 
 function filterQuotes() {
     const category = document.getElementById("categoryFilter").value;
-    selectedCategory = category; // ✅ use selectedCategory
+    selectedCategory = category;
     saveSelectedFilter(selectedCategory);
 
     let filtered = selectedCategory === "all"
@@ -74,7 +79,7 @@ function filterQuotes() {
         return;
     }
 
-    const randomIndex = Math.floor(Math.random() * filtered.length); // ✅ Math.random used
+    const randomIndex = Math.floor(Math.random() * filtered.length);
     const quote = filtered[randomIndex];
 
     display.textContent = `"${quote.text}" — ${quote.category}`;
@@ -166,12 +171,46 @@ function loadLastSessionQuote() {
     }
 }
 
-// Initialize
+// ✅ Simulate fetching quotes from server
+function fetchQuotesFromServer() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(simulatedServerQuotes);
+        }, 1000);
+    });
+}
+
+// ✅ Sync with "server" and resolve conflicts
+function syncWithServer() {
+    fetchQuotesFromServer().then(serverQuotes => {
+        const localTexts = quotes.map(q => q.text);
+        const newQuotes = serverQuotes.filter(q => !localTexts.includes(q.text));
+
+        if (newQuotes.length > 0) {
+            quotes.push(...newQuotes);
+            saveQuotes();
+            populateCategories();
+            showConflictNotification(newQuotes.length);
+        }
+    });
+}
+
+// ✅ Notify user of sync
+function showConflictNotification(count) {
+    const notif = document.getElementById("notification");
+    notif.textContent = `⚠️ ${count} new quote(s) synced from server.`;
+    setTimeout(() => notif.textContent = "", 5000);
+}
+
+// ✅ Periodic sync every 30 seconds
+setInterval(syncWithServer, 30000);
+
+// ✅ Init
 loadQuotes();
 createAddQuoteForm();
 populateCategories();
 loadLastSessionQuote();
 
-// Events
+// ✅ Event listeners
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
 document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
