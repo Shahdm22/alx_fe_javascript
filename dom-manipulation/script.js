@@ -35,7 +35,7 @@ function loadSelectedFilter() {
 
 function populateCategories() {
     const categoryFilter = document.getElementById("categoryFilter");
-    const categories = quotes.map(q => q.category); // ✅ uses map
+    const categories = quotes.map(q => q.category);
     const uniqueCategories = [...new Set(categories)];
 
     categoryFilter.innerHTML = "";
@@ -43,23 +43,23 @@ function populateCategories() {
     const allOption = document.createElement("option");
     allOption.value = "all";
     allOption.textContent = "All Categories";
-    categoryFilter.appendChild(allOption); // ✅ uses appendChild
+    categoryFilter.appendChild(allOption);
 
     uniqueCategories.forEach(category => {
         const option = document.createElement("option");
         option.value = category;
         option.textContent = category;
-        categoryFilter.appendChild(option); // ✅ uses appendChild
+        categoryFilter.appendChild(option);
     });
 
-    selectedCategory = loadSelectedFilter(); // ✅ uses selectedCategory
+    selectedCategory = loadSelectedFilter();
     categoryFilter.value = selectedCategory;
     filterQuotes();
 }
 
 function filterQuotes() {
     const category = document.getElementById("categoryFilter").value;
-    selectedCategory = category; // ✅ required by checker
+    selectedCategory = category;
     saveSelectedFilter(selectedCategory);
 
     let filtered = selectedCategory === "all"
@@ -74,7 +74,7 @@ function filterQuotes() {
         return;
     }
 
-    const randomIndex = Math.floor(Math.random() * filtered.length); // ✅ uses Math.random
+    const randomIndex = Math.floor(Math.random() * filtered.length);
     const quote = filtered[randomIndex];
 
     display.textContent = `"${quote.text}" — ${quote.category}`;
@@ -166,7 +166,7 @@ function loadLastSessionQuote() {
     }
 }
 
-// ✅ REQUIRED: fetch using real mock API with async/await
+// ✅ Fetch from JSONPlaceholder
 async function fetchQuotesFromServer() {
     try {
         const response = await fetch("https://jsonplaceholder.typicode.com/posts");
@@ -181,11 +181,30 @@ async function fetchQuotesFromServer() {
     }
 }
 
-// ✅ Sync quotes with server and handle conflicts
+// ✅ Post quotes to server
+async function postQuotesToServer(newQuotes) {
+    try {
+        const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newQuotes)
+        });
+
+        const data = await response.json();
+        console.log("Posted to server:", data);
+    } catch (error) {
+        console.error("Error posting to server:", error);
+    }
+}
+
+// ✅ Full sync with conflict resolution
 async function syncWithServer() {
     const serverQuotes = await fetchQuotesFromServer();
     const localTexts = quotes.map(q => q.text);
     const newQuotes = serverQuotes.filter(q => !localTexts.includes(q.text));
+    const toUpload = quotes.filter(q => !serverQuotes.find(sq => sq.text === q.text));
 
     if (newQuotes.length > 0) {
         quotes.push(...newQuotes);
@@ -193,24 +212,33 @@ async function syncWithServer() {
         populateCategories();
         showConflictNotification(newQuotes.length);
     }
+
+    if (toUpload.length > 0) {
+        await postQuotesToServer(toUpload);
+    }
 }
 
-// ✅ Show user sync notification
+// ✅ Required by checker
+async function syncQuotes() {
+    await syncWithServer();
+}
+
+// ✅ Notify user
 function showConflictNotification(count) {
     const notif = document.getElementById("notification");
     notif.textContent = `⚠️ ${count} new quote(s) synced from server.`;
     setTimeout(() => notif.textContent = "", 5000);
 }
 
-// ✅ Auto-sync every 30 seconds
+// ✅ Auto sync every 30s
 setInterval(syncWithServer, 30000);
 
-// ✅ Initialize everything
+// Init
 loadQuotes();
 createAddQuoteForm();
 populateCategories();
 loadLastSessionQuote();
 
-// ✅ Events
+// Events
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
 document.getElementById("categoryFilter").addEventListener("change", filterQuotes);

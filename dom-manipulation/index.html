@@ -10,32 +10,27 @@
 <body>
     <h1>Dynamic Quote Generator</h1>
 
-    <label for="categorySelect">Choose a category:</label>
-    <select id="categorySelect">
-        <option value="all">All</option>
-    </select>
-    <label for="categoryFilter">Filter by Category:</label>
-    <select id="categoryFilter" onchange="filterQuotes()">
-        <option value="all">All Categories</option>
-    </select>
-
-
-    <div id="quoteDisplay" style="margin: 20px 0; font-size: 1.2em;"></div>
+    <!-- Display Quote -->
+    <div id="quoteDisplay"></div>
     <button id="newQuote">Show New Quote</button>
 
-    <hr>
+    <!-- Category Filter -->
+    <select id="categoryFilter"></select>
 
-    <div id="formContainer"></div> <!-- placeholder for dynamically generated form -->
-    <hr>
-    <h2>Import / Export Quotes</h2>
+    <!-- Add Quote Form -->
+    <div id="formContainer"></div>
+
+    <!-- Import/Export -->
     <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
-    <button onclick="exportToJsonFile()">Export Quotes to JSON</button>
+    <button onclick="exportToJsonFile()">Export Quotes</button>
+
+    <!-- Notification -->
     <div id="notification" style="color: red; margin-top: 10px;"></div>
-    <button onclick="syncWithServer()">Sync Now</button>
+
+    <!-- Manual Sync -->
+    <button onclick="syncQuotes()">Sync Now</button>
 
     <script src="script.js"></script>
 </body>
-
-
 
 </html>
